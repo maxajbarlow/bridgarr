@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Linkarr</string>
+    <string name="app_version">v0.1.0-build.1</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_movies">Movies</string>
+    <string name="nav_tv_shows">TV Shows</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Authentication -->
+    <string name="login_title">Welcome to Linkarr</string>
+    <string name="login_subtitle">Direct streaming from Real-Debrid</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="rd_token">Real-Debrid API Token</string>
+    <string name="rd_token_hint">Enter your RD API token</string>
+
+    <!-- Media -->
+    <string name="play">Play</string>
+    <string name="resume">Resume</string>
+    <string name="details">Details</string>
+    <string name="seasons">Seasons</string>
+    <string name="episodes">Episodes</string>
+    <string name="season_format">Season %1$d</string>
+    <string name="episode_format">E%1$d</string>
+
+    <!-- Player -->
+    <string name="player_loading">Loading stream…</string>
+    <string name="player_buffering">Buffering…</string>
+    <string name="player_error">Playback error occurred</string>
+
+    <!-- Settings -->
+    <string name="settings_account">Account</string>
+    <string name="settings_playback">Playback</string>
+    <string name="settings_about">About</string>
+    <string name="logout">Logout</string>
+
+    <!-- Errors -->
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_auth">Authentication failed. Please check your credentials.</string>
+    <string name="error_generic">An error occurred. Please try again.</string>
+    <string name="error_no_stream">No streaming URL available.</string>
+</resources>
