@@ -13,8 +13,8 @@ android {
         applicationId = "com.linkarr.tv"
         minSdk = 28
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0-build.1"
+        versionCode = 3
+        versionName = "0.1.0-build.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

@@ -1,4 +1,4 @@
-# Linkarr - v0.1.0-build.2
+# Linkarr - v0.1.0-build.3
 
 **Real-Debrid Direct Streaming Platform**
 
@@ -188,8 +188,9 @@ SECRET_KEY=your-secret-key-here
 - [x] Link cache manager with auto-refresh
 - [x] Celery background tasks (link refresh, torrent monitoring)
 - [x] Android TV project structure
-- [ ] Android TV data layer (API client, repositories)
-- [ ] Android TV UI screens (Home, Detail, Player)
+- [x] Android TV data layer (API client, repositories, ViewModels)
+- [x] Android TV UI screens (Login, Home, Detail)
+- [ ] Android TV Player screen
 - [ ] ExoPlayer integration
 
 ### v0.2.0 - Enhanced Features
@@ -221,7 +222,7 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Current Build**: v0.1.0-build.2
+**Current Build**: v0.1.0-build.3
 **Last Updated**: 2025-10-14
 
 **Implementation Status**:
@@ -230,4 +231,5 @@ MIT License - See LICENSE file for details
 - ✅ Service Layer: Complete
 - ✅ Background Tasks: Complete
 - ✅ Database Migrations: Setup Complete
-- 🚧 Android TV Client: Structure Complete, Implementation In Progress
+- ✅ Android TV Client: Data Layer Complete
+- 🚧 Android TV Client: Video Player In Progress
