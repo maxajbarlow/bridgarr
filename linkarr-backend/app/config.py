@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     RD_LINK_EXPIRY_HOURS: int = 4
 
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:8000"
 
     class Config:
         env_file = ".env"
