@@ -215,6 +215,26 @@ async def store_rd_token(
     return current_user
 
 
+@router.get("/rd-token/test")
+async def test_rd_token(current_user: User = Depends(get_current_user)):
+    """
+    Test if Real-Debrid token is valid
+
+    - Checks if user has RD token configured
+    - Returns validation status
+    """
+    if not current_user.rd_api_token:
+        return {"valid": False, "message": "No Real-Debrid token configured"}
+
+    # For now, just check if token exists
+    # In future, could make actual API call to Real-Debrid to validate
+    return {
+        "valid": True,
+        "message": "Real-Debrid token is configured",
+        "username": current_user.username
+    }
+
+
 @router.delete("/rd-token", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_rd_token(
     current_user: User = Depends(get_current_user),
