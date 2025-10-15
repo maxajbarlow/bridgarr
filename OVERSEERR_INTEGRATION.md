@@ -1,20 +1,44 @@
-# Overseerr Integration Guide
+# Overseerr Integration Guide for Linkarr
 
 ## Overview
 
 Connect Overseerr to Linkarr to automatically add approved media requests to your library. When a user requests content in Overseerr and it gets approved, Linkarr will automatically receive the notification and add it to your library.
 
+**Overseerr Installation:**
+- ✅ Installed and running on port 5056
+- Container: `overseerr`
+- Access URL: http://YOUR_SERVER_IP:5056
+- Status: Ready for setup
+
+**Note:** Jellyseerr (for Jellyfin) is running separately on port 5055
+
+---
+
+## 🌐 Access Overseerr
+
+**URL:** http://YOUR_SERVER_IP:5056
+
+On first access, you'll see the setup wizard.
+
 ---
 
 ## 🔗 Step-by-Step Setup
 
-### 1. Access Overseerr Settings
+### 1. Complete Initial Setup
 
-1. Open your Overseerr instance
-2. Login as an admin
-3. Navigate to **Settings** (gear icon)
-4. Go to **Notifications** in the left sidebar
-5. Click on **Webhook**
+1. Open http://YOUR_SERVER_IP:5056
+2. Create admin account (username, email, password)
+3. Skip Plex/Jellyfin server connection (not needed for Linkarr)
+4. Configure TMDb:
+   - Sign in with TMDb account OR
+   - Provide TMDb API key from https://www.themoviedb.org/settings/api
+
+### 2. Access Overseerr Settings
+
+1. Login as admin
+2. Navigate to **Settings** (gear icon)
+3. Go to **Notifications** in the left sidebar
+4. Click on **Webhook**
 
 ### 2. Configure Webhook
 
@@ -370,3 +394,29 @@ curl -v http://YOUR_SERVER_IP:8000/api/webhooks/test
 
 **Last Updated:** 2025-10-14
 **Linkarr Version:** v0.1.0-build.3
+
+---
+
+## 📌 Important Notes
+
+### Port Configuration
+
+- **Overseerr (for Linkarr)**: Port 5056
+- **Jellyseerr (for Jellyfin)**: Port 5055
+
+Both can run simultaneously without conflicts.
+
+### Quick Access URLs
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| Overseerr | http://YOUR_SERVER_IP:5056 | Request media for Linkarr |
+| Jellyseerr | http://YOUR_SERVER_IP:5055 | Request media for Jellyfin |
+| Linkarr Web | http://YOUR_SERVER_IP:3002 | Browse & stream media |
+| Linkarr API | http://YOUR_SERVER_IP:8000 | Backend API |
+
+---
+
+**Last Updated:** 2025-10-16
+**Linkarr Version:** v0.1.0-build.5
+**Overseerr Port:** 5056 (dedicated for Linkarr)
