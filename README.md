@@ -1,26 +1,37 @@
-# Linkarr - v0.1.0-build.3
+# Linkarr - v0.1.0-build.4
 
 **Real-Debrid Direct Streaming Platform**
 
 Linkarr is a lightweight alternative to traditional media server setups (Jellyfin/Plex + Riven). Instead of proxying streams through your VPS and consuming bandwidth, Linkarr stores only metadata and Real-Debrid URLs, allowing clients to stream directly from Real-Debrid's CDN.
 
+## 🚀 Quick Access
+
+- **Web Management**: http://YOUR_SERVER_IP:3002
+- **API Backend**: http://YOUR_SERVER_IP:8000
+- **API Documentation**: http://YOUR_SERVER_IP:8000/api/docs
+- **Overseerr Webhook**: http://YOUR_SERVER_IP:8000/api/webhooks/overseerr
+
 ## Architecture Overview
 
 ```
 ┌─────────────────┐         ┌──────────────┐         ┌─────────────────┐
-│   Overseerr     │────────>│   Linkarr    │<────────│  Android TV     │
-│   (Requests)    │ Webhook │   Backend    │  REST   │    Client       │
+│   Overseerr     │────────>│   Linkarr    │<────────│  Web Browser    │
+│   (Requests)    │ Webhook │   Backend    │  REST   │  Management UI  │
 └─────────────────┘         │              │  API    │                 │
-                            │  • Metadata  │         │  • ExoPlayer    │
-                            │  • RD URLs   │         │  • Compose TV   │
-                            │  • Auth      │         │  • Direct CDN   │
-                            │              │         │    Streaming    │
-                            └──────┬───────┘         └─────────────────┘
-                                   │
-                                   v
-                            ┌──────────────┐
-                            │ Real-Debrid  │
-                            │     API      │
+                            │  • Metadata  │         │  • Dashboard    │
+                            │  • RD URLs   │<────────│  • Library      │
+                            │  • Auth      │         │  • Settings     │
+                            │  • Tasks     │         └─────────────────┘
+                            │              │
+                            └──────┬───────┘         ┌─────────────────┐
+                                   │         REST    │  Android TV     │
+                                   ├─────────────────│    Client       │
+                                   │         API     │                 │
+                                   │                 │  • ExoPlayer    │
+                                   v                 │  • Compose TV   │
+                            ┌──────────────┐         │  • Direct CDN   │
+                            │ Real-Debrid  │         │    Streaming    │
+                            │     API      │         └─────────────────┘
                             └──────────────┘
 ```
 
@@ -44,6 +55,15 @@ Linkarr is a lightweight alternative to traditional media server setups (Jellyfi
 - **SQLAlchemy** - ORM for database operations
 - **Docker** - Containerized deployment
 
+### Web Management Frontend
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **Axios** - HTTP client with interceptors
+- **SWR** - Data fetching and caching
+- **React Hot Toast** - Notifications
+- **Docker** - Production deployment
+
 ### Android TV Client
 - **Kotlin** - Primary programming language
 - **Jetpack Compose for TV** - Modern declarative UI
@@ -64,6 +84,16 @@ linkarr/
 │   ├── docker-compose.yml
 │   ├── Dockerfile
 │   └── requirements.txt
+├── linkarr-web/             # Next.js web management UI
+│   ├── app/                 # Next.js app directory
+│   │   ├── page.tsx         # Dashboard page
+│   │   ├── layout.tsx       # Root layout
+│   │   └── globals.css      # Global styles
+│   ├── lib/                 # Utilities
+│   │   └── api.ts           # API client
+│   ├── Dockerfile
+│   ├── package.json
+│   └── next.config.js
 ├── linkarr-android/         # Android TV client
 │   ├── app/
 │   │   └── src/main/
@@ -73,12 +103,36 @@ linkarr/
 │   │       │   └── ui/      # Compose screens
 │   │       └── res/         # Resources
 │   └── build.gradle.kts
-└── docs/                    # Documentation
+├── docker-compose.yml       # Unified deployment
+├── OVERSEERR_INTEGRATION.md # Integration guide
+└── README.md                # This file
 ```
 
 ## Quick Start
 
-### Backend Setup
+### Full Stack Deployment (Recommended)
+
+Deploy backend and web frontend together:
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd linkarr
+
+# Configure environment
+cp linkarr-backend/.env.example linkarr-backend/.env
+# Edit .env and add your TMDb API key and adjust settings
+
+# Start all services
+docker-compose up -d
+```
+
+Services will be available at:
+- **Web UI**: http://localhost:3002
+- **API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/api/docs
+
+### Backend Only Setup
 
 ```bash
 cd linkarr-backend
@@ -86,6 +140,16 @@ docker-compose up -d
 ```
 
 The backend will be available at `http://localhost:8000`
+
+### Web Frontend Development
+
+```bash
+cd linkarr-web
+npm install
+npm run dev
+```
+
+Development server: `http://localhost:3000`
 
 ### Android TV Setup
 
@@ -222,14 +286,25 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Current Build**: v0.1.0-build.3
-**Last Updated**: 2025-10-14
+**Current Build**: v0.1.0-build.4
+**Last Updated**: 2025-10-15
 
-**Implementation Status**:
-- ✅ Backend Core: Complete
-- ✅ API Endpoints: Complete
+**Deployment Status**:
+- ✅ Backend Core: Complete & Deployed
+- ✅ API Endpoints: Complete & Running
 - ✅ Service Layer: Complete
-- ✅ Background Tasks: Complete
-- ✅ Database Migrations: Setup Complete
+- ✅ Background Tasks: Complete & Running
+- ✅ Database Migrations: Complete
+- ✅ Web Management UI: Complete & Deployed
+- ✅ Overseerr Integration: Complete & Documented
+- ✅ Docker Deployment: Complete
 - ✅ Android TV Client: Data Layer Complete
 - 🚧 Android TV Client: Video Player In Progress
+
+**Live Deployment** (VPS1 - your-vps-hostname):
+- Backend API: http://YOUR_SERVER_IP:8000
+- Web Management: http://YOUR_SERVER_IP:3002
+- PostgreSQL: Running on port 5432
+- Redis: Running on port 6379
+- Celery Worker: Active
+- Celery Beat: Active

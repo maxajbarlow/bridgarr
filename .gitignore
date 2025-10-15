@@ -10,7 +10,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -27,6 +26,11 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 
+# Python lib directories (but not Next.js lib/)
+linkarr-backend/lib/
+**/venv/lib/
+**/env/lib/
+
 # Virtual Environment
 venv/
 ENV/
@@ -41,8 +45,8 @@ env/
 *~
 .DS_Store
 
-# Docker
-.dockerignore
+# Docker (ignore backend .dockerignore but not web)
+linkarr-backend/.dockerignore
 
 # Environment files
 .env
