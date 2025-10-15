@@ -1,4 +1,4 @@
-# Linkarr - v0.1.0-build.4
+# Linkarr - v0.1.0-build.5
 
 **Real-Debrid Direct Streaming Platform**
 
@@ -286,7 +286,7 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Current Build**: v0.1.0-build.4
+**Current Build**: v0.1.0-build.5
 **Last Updated**: 2025-10-15
 
 **Deployment Status**:
@@ -296,6 +296,9 @@ MIT License - See LICENSE file for details
 - ✅ Background Tasks: Complete & Running
 - ✅ Database Migrations: Complete
 - ✅ Web Management UI: Complete & Deployed
+- ✅ Library Browser: Complete & Deployed
+- ✅ Settings Page: Complete & Deployed
+- ✅ Media Detail Pages: Complete & Deployed
 - ✅ Overseerr Integration: Complete & Documented
 - ✅ Docker Deployment: Complete
 - ✅ Android TV Client: Data Layer Complete

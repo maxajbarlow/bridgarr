@@ -55,6 +55,24 @@ export const authApi = {
     })
     return response.data
   },
+
+  // Aliases for consistency
+  getProfile: async () => {
+    const response = await api.get('/api/auth/me')
+    return response.data
+  },
+
+  saveRdToken: async (rdToken: string) => {
+    const response = await api.post('/api/auth/rd-token', {
+      rd_api_token: rdToken,
+    })
+    return response.data
+  },
+
+  testRdToken: async () => {
+    const response = await api.get('/api/auth/rd-token/test')
+    return response.data
+  },
 }
 
 // Library API
@@ -91,6 +109,14 @@ export const libraryApi = {
     })
     return response.data
   },
+
+  // Alias for consistency
+  getShows: async (page = 1, pageSize = 20) => {
+    const response = await api.get('/api/library/shows', {
+      params: { page, page_size: pageSize },
+    })
+    return response.data
+  },
 }
 
 // Media API
@@ -107,6 +133,11 @@ export const mediaApi = {
 
   getEpisodes: async (mediaId: number, seasonNumber: number) => {
     const response = await api.get(`/api/media/${mediaId}/seasons/${seasonNumber}/episodes`)
+    return response.data
+  },
+
+  getStreamUrl: async (mediaId: number) => {
+    const response = await api.get(`/api/media/${mediaId}/play`)
     return response.data
   },
 }
