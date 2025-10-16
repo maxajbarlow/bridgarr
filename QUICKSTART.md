@@ -208,7 +208,7 @@ curl http://YOUR_SERVER_IP:8000/api/webhooks/test
   "status": "ok",
   "message": "Webhook endpoint is reachable",
   "service": "Linkarr",
-  "version": "0.1.0-build.5"
+  "version": "0.1.0-build.6"
 }
 ```
 
@@ -302,7 +302,7 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 ---
 
 **Last Updated**: 2025-10-16
-**Linkarr Version**: v0.1.0-build.5
+**Linkarr Version**: v0.1.0-build.6
 **Status**: Production Ready ✅
 
 Happy streaming! 🎬🍿

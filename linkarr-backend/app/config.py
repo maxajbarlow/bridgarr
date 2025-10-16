@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     # Application
     APP_NAME: str = "Linkarr"
-    APP_VERSION: str = "0.1.0-build.5"
+    APP_VERSION: str = "0.1.0-build.6"
     DEBUG: bool = False
 
     # Database

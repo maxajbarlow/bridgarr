@@ -163,7 +163,7 @@ Expected response:
   "status": "ok",
   "message": "Webhook endpoint is reachable",
   "service": "Linkarr",
-  "version": "0.1.0-build.5"
+  "version": "0.1.0-build.6"
 }
 ```
 
@@ -204,4 +204,4 @@ http://YOUR_SERVER_IP:3002/library
 ---
 
 **Last Updated**: 2025-10-16
-**Linkarr Version**: v0.1.0-build.5
+**Linkarr Version**: v0.1.0-build.6
