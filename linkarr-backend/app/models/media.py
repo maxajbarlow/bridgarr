@@ -33,6 +33,7 @@ class MediaItem(Base):
     overview = Column(Text, nullable=True)
     release_date = Column(String(50), nullable=True)
     runtime = Column(Integer, nullable=True)  # in minutes
+    genres = Column(String(500), nullable=True)  # Comma-separated list
 
     # Images
     poster_path = Column(String(500), nullable=True)

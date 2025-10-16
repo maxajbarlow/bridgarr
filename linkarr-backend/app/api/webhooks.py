@@ -12,6 +12,8 @@ from pydantic import BaseModel
 from app.config import settings
 from app.database import get_db
 from app.models.media import MediaItem, MediaType
+from app.services.tmdb import tmdb_service
+from app.services.content_processor import ContentProcessor
 
 # Router setup
 router = APIRouter()
@@ -73,15 +75,23 @@ async def process_overseerr_request(
     This runs asynchronously after webhook response is sent
     """
     try:
+        # Log incoming webhook data
+        print(f"[WEBHOOK] Notification type: {notification_type}")
+        print(f"[WEBHOOK] Media data: {media_data}")
+
         # Only process approved or available requests
-        if notification_type not in ["MEDIA_APPROVED", "MEDIA_AVAILABLE"]:
+        if notification_type not in ["MEDIA_APPROVED", "MEDIA_AVAILABLE", "MEDIA_AUTO_APPROVED"]:
+            print(f"[WEBHOOK] Skipping notification type: {notification_type}")
             return
 
         # Extract media info
         tmdb_id = media_data.get("tmdbId")
         media_type_str = media_data.get("media_type", "movie")
 
+        print(f"[WEBHOOK] Extracted TMDb ID: {tmdb_id}, Media type: {media_type_str}")
+
         if not tmdb_id:
+            print(f"[WEBHOOK] No TMDb ID found in payload!")
             return
 
         # Convert media type
@@ -108,13 +118,64 @@ async def process_overseerr_request(
         db.commit()
         db.refresh(new_media)
 
-        # TODO: Trigger background tasks:
-        # 1. Fetch metadata from TMDb API
-        # 2. Search for torrents
-        # 3. Add to Real-Debrid
-        # 4. Update media item with streaming URLs
+        print(f"[WEBHOOK] ✓ Created media item: ID={new_media.id}, Title={new_media.title}, TMDb ID={tmdb_id}")
 
-        # Note: These will be implemented in the service layer and Celery tasks
+        # Fetch metadata from TMDb
+        print(f"[WEBHOOK] Fetching metadata from TMDb for ID {tmdb_id}...")
+
+        if media_type == MediaType.MOVIE:
+            metadata = tmdb_service.get_movie_details(tmdb_id)
+        else:
+            metadata = tmdb_service.get_tv_details(tmdb_id)
+
+        if metadata:
+            # Update media item with fetched metadata
+            new_media.title = metadata.get("title", new_media.title)
+            new_media.overview = metadata.get("overview")
+            new_media.poster_path = metadata.get("poster_path")
+            new_media.backdrop_path = metadata.get("backdrop_path")
+            new_media.release_date = metadata.get("release_date") or metadata.get("first_air_date")
+            new_media.runtime = metadata.get("runtime")
+            new_media.imdb_id = metadata.get("imdb_id")
+            new_media.vote_average = int(metadata.get("vote_average", 0) * 10) if metadata.get("vote_average") else None
+            new_media.vote_count = metadata.get("vote_count")
+
+            # Convert genres list to comma-separated string
+            genres_list = metadata.get("genres", [])
+            new_media.genres = ", ".join(genres_list) if genres_list else None
+
+            db.commit()
+            db.refresh(new_media)
+
+            print(f"[WEBHOOK] ✓ Updated metadata for: {new_media.title}")
+        else:
+            print(f"[WEBHOOK] ⚠ Could not fetch metadata from TMDb")
+
+        # Step 3: Search torrents and add to Real-Debrid
+        print(f"[WEBHOOK] Starting content processing...")
+
+        # Note: User's RD token should be fetched from database/context
+        # For now, we'll try without RD token to test scraping
+        processor = ContentProcessor(rd_api_token=None)  # TODO: Get user's RD token
+
+        import asyncio
+        processing_result = asyncio.run(processor.process_movie(
+            title=new_media.title,
+            year=int(new_media.release_date[:4]) if new_media.release_date else None,
+            imdb_id=new_media.imdb_id,
+            tmdb_id=tmdb_id
+        ))
+
+        print(f"[WEBHOOK] Processing result: {processing_result.get('message')}")
+        print(f"[WEBHOOK] Torrents found: {processing_result.get('torrents_found', 0)}")
+
+        if processing_result.get("success"):
+            # Update media item with RD info
+            new_media.is_available = True
+            db.commit()
+            print(f"[WEBHOOK] ✓ Media marked as available!")
+        else:
+            print(f"[WEBHOOK] ⚠ Content processing incomplete: {processing_result.get('message')}")
 
     except Exception as e:
         # Log error but don't fail webhook response
@@ -154,6 +215,11 @@ async def handle_overseerr_webhook(
         # You can check user_agent or add webhook secret validation here
 
         notification_type = webhook_data.notification_type
+
+        print(f"[WEBHOOK HANDLER] Received notification: {notification_type}")
+        print(f"[WEBHOOK HANDLER] Media data present: {webhook_data.media is not None}")
+        if webhook_data.media:
+            print(f"[WEBHOOK HANDLER] Media dict: {webhook_data.media}")
 
         # Only process approved or available media
         if notification_type in ["MEDIA_APPROVED", "MEDIA_AVAILABLE", "MEDIA_AUTO_APPROVED"]:
