@@ -1,4 +1,4 @@
-# Linkarr - v0.1.0-build.6
+# Linkarr - v0.1.0-build.7
 
 **Real-Debrid Direct Streaming Platform**
 
@@ -286,7 +286,7 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Current Build**: v0.1.0-build.6
+**Current Build**: v0.1.0-build.7
 **Last Updated**: 2025-10-15
 
 **Deployment Status**:
