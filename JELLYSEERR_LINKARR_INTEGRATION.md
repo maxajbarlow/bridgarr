@@ -76,7 +76,35 @@ You have two options:
 
 ## 🔗 Webhook Configuration for Linkarr
 
-After completing initial setup, configure the webhook to send requests to Linkarr:
+After completing initial setup, configure the webhook to send requests to Linkarr.
+
+### 🤖 Automated Configuration (Recommended)
+
+We've created a Python script to automate the webhook configuration:
+
+**Step 1**: Complete the Jellyseerr setup wizard first (create admin account, configure TMDb)
+
+**Step 2**: Run the configuration script:
+```bash
+cd /root/linkarr/scripts
+python3 configure-jellyseerr-webhook.py
+```
+
+The script will:
+- ✅ Login to Jellyseerr-Linkarr
+- ✅ Configure webhook URL
+- ✅ Enable correct notification types
+- ✅ Test the connection
+- ✅ Verify everything works
+
+**Script location**: `/root/linkarr/scripts/configure-jellyseerr-webhook.py`
+**Documentation**: `/root/linkarr/scripts/README.md`
+
+---
+
+### 📝 Manual Configuration
+
+If you prefer to configure manually, follow these steps:
 
 ### Step 1: Access Settings
 
