@@ -12,7 +12,7 @@ import logging
 from app.models.rd_link import RDLink
 from app.models.rd_torrent import RDTorrent
 from app.models.media import MediaItem
-from app.services.rd_client import RealDebridClient
+from app.services.debrid import RealDebridClient
 
 logger = logging.getLogger(__name__)
 

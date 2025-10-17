@@ -12,7 +12,7 @@ from app.models.media import MediaItem, Season, Episode, MediaType
 from app.models.rd_torrent import RDTorrent
 from app.models.rd_link import RDLink
 from app.services.metadata_manager import MetadataManager
-from app.services.rd_client import RealDebridClient
+from app.services.debrid import RealDebridClient
 
 logger = logging.getLogger(__name__)
 

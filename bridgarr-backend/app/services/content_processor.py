@@ -7,7 +7,7 @@ Orchestrates scraping and adding content to Real-Debrid
 import asyncio
 from typing import List, Optional
 from app.services.scrapers import TorrentioScraper, ZileanScraper, TorrentResult
-from app.services.rd_client import RealDebridClient
+from app.services.debrid import RealDebridClient
 
 
 class ContentProcessor:

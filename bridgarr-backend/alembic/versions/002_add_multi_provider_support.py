@@ -1,7 +1,7 @@
 """add multi-provider support
 
 Revision ID: 002
-Revises: 001
+Revises:
 Create Date: 2025-10-17
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '002'
-down_revision = '001'
+down_revision = None  # This is the first migration
 branch_labels = None
 depends_on = None
 

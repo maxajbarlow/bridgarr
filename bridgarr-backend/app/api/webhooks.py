@@ -17,7 +17,7 @@ from app.models.rd_torrent import RDTorrent
 from app.models.rd_link import RDLink
 from app.services.tmdb import tmdb_service
 from app.services.content_processor import ContentProcessor
-from app.services.rd_client import RealDebridClient
+from app.services.debrid import RealDebridClient
 
 # Router setup
 router = APIRouter()

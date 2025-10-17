@@ -11,7 +11,7 @@ from app.tasks.celery_app import celery_app
 from app.database import SessionLocal
 from app.models.user import User
 from app.models.rd_torrent import RDTorrent
-from app.services.rd_client import RealDebridClient
+from app.services.debrid import RealDebridClient
 
 logger = logging.getLogger(__name__)
 
