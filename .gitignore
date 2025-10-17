@@ -10,6 +10,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+lib/
 lib64/
 parts/
 sdist/
@@ -21,21 +22,56 @@ wheels/
 MANIFEST
 *.log
 local_settings.py
-db.sqlite3
-db.sqlite3-journal
 instance/
 .webassets-cache
+.scrapy
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+celerybeat-schedule
+celerybeat.pid
 
-# Python lib directories (but not Next.js lib/)
-linkarr-backend/lib/
-**/venv/lib/
-**/env/lib/
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+.nuxt
+.cache
+.parcel-cache
+dist
+.env*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+.turbo
 
-# Virtual Environment
-venv/
-ENV/
-env/
-.venv
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgres_data/
+
+# Docker
+docker-compose.override.yml
 
 # IDEs
 .vscode/
@@ -44,66 +80,57 @@ env/
 *.swo
 *~
 .DS_Store
-
-# Docker (ignore backend .dockerignore but not web)
-linkarr-backend/.dockerignore
-
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# Database
-*.db
-*.db-journal
-*.db-shm
-*.db-wal
-postgres-data/
-
-# Celery
-celerybeat-schedule
-celerybeat.pid
-
-# Android
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-*.apk
-*.ap_
-*.aab
-
-# Android Studio
-/gradle
-/gradlew
-/gradlew.bat
-.gradle/
-*.hprof
-
-# Keystore files
-*.jks
-*.keystore
-
-# Secrets
-secrets/
-*.key
-*.pem
+*.sublime-project
+*.sublime-workspace
 
 # Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Temp files
+# OS
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# Temporary files
 tmp/
 temp/
 *.tmp
+
+# Secrets and credentials
+*.pem
+*.key
+*.crt
+secrets/
+credentials/
+
+# Backups
+*.bak
+*.backup
+backup/
+backups/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Android
+bridgarr-android/.gradle/
+bridgarr-android/.idea/
+bridgarr-android/local.properties
+bridgarr-android/build/
+bridgarr-android/captures/
+bridgarr-android/app/build/
+bridgarr-android/*.iml
+bridgarr-android/*.apk
+bridgarr-android/*.ap_
+bridgarr-android/*.aab
+
+# Ignore deployment-specific files
+DEPLOYMENT_NOTES.md
+SERVER_INFO.md

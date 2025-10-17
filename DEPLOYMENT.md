@@ -1,4 +1,4 @@
-# Linkarr Deployment Guide - v0.1.0-build.4
+# Bridgarr Deployment Guide - v0.1.0-build.4
 
 ## Current Deployment Status
 
@@ -53,37 +53,37 @@
 
 ## Docker Container Details
 
-### Backend Services (docker-compose in linkarr-backend/)
+### Backend Services (docker-compose in bridgarr-backend/)
 
 ```yaml
-linkarr-backend:
-  - Image: linkarr-backend-backend
+bridgarr-backend:
+  - Image: bridgarr-backend-backend
   - Ports: 8000:8000
   - Status: Running
   - Health: OK
   - Restart: unless-stopped
 
-linkarr-postgres:
+bridgarr-postgres:
   - Image: postgres:15-alpine
   - Ports: 5432:5432
   - Volume: postgres_data
   - Status: Running (Healthy)
   - Restart: unless-stopped
 
-linkarr-redis:
+bridgarr-redis:
   - Image: redis:7-alpine
   - Ports: 6379:6379
   - Status: Running (Healthy)
   - Restart: unless-stopped
 
-linkarr-celery-worker:
-  - Image: linkarr-backend-backend
+bridgarr-celery-worker:
+  - Image: bridgarr-backend-backend
   - Command: celery worker
   - Status: Running
   - Restart: unless-stopped
 
-linkarr-celery-beat:
-  - Image: linkarr-backend-backend
+bridgarr-celery-beat:
+  - Image: bridgarr-backend-backend
   - Command: celery beat
   - Status: Running
   - Restart: unless-stopped
@@ -92,8 +92,8 @@ linkarr-celery-beat:
 ### Web Frontend (standalone container)
 
 ```yaml
-linkarr-web:
-  - Image: linkarr-web
+bridgarr-web:
+  - Image: bridgarr-web
   - Ports: 3002:3000
   - Status: Running
   - Restart: unless-stopped
@@ -107,72 +107,72 @@ linkarr-web:
 
 ```bash
 # Backend services
-cd /root/linkarr/linkarr-backend
+cd /root/bridgarr/bridgarr-backend
 docker-compose ps
 
 # Web frontend
-docker ps | grep linkarr-web
+docker ps | grep bridgarr-web
 
 # All services
-docker ps | grep linkarr
+docker ps | grep bridgarr
 ```
 
 ### View Logs
 
 ```bash
 # Backend API logs
-docker logs linkarr-backend -f
+docker logs bridgarr-backend -f
 
 # Web frontend logs
-docker logs linkarr-web -f
+docker logs bridgarr-web -f
 
 # Celery worker logs
-docker logs linkarr-celery-worker -f
+docker logs bridgarr-celery-worker -f
 
 # Celery beat logs
-docker logs linkarr-celery-beat -f
+docker logs bridgarr-celery-beat -f
 
 # Database logs
-docker logs linkarr-postgres -f
+docker logs bridgarr-postgres -f
 ```
 
 ### Restart Services
 
 ```bash
 # Restart backend
-cd /root/linkarr/linkarr-backend
+cd /root/bridgarr/bridgarr-backend
 docker-compose restart backend
 
 # Restart web frontend
-docker restart linkarr-web
+docker restart bridgarr-web
 
 # Restart all backend services
 docker-compose restart
 
 # Restart everything
-docker-compose restart && docker restart linkarr-web
+docker-compose restart && docker restart bridgarr-web
 ```
 
 ### Update Deployment
 
 ```bash
 # Pull latest code
-cd /root/linkarr
+cd /root/bridgarr
 git pull
 
 # Rebuild backend
-cd linkarr-backend
+cd bridgarr-backend
 docker-compose build --no-cache
 docker-compose up -d
 
 # Rebuild web frontend
-cd ../linkarr-web
-docker build -t linkarr-web .
-docker stop linkarr-web
-docker rm linkarr-web
-docker run -d -p 3002:3000 --name linkarr-web \
+cd ../bridgarr-web
+docker build -t bridgarr-web .
+docker stop bridgarr-web
+docker rm bridgarr-web
+docker run -d -p 3002:3000 --name bridgarr-web \
   -e NEXT_PUBLIC_API_URL=http://YOUR_SERVER_IP:8000 \
-  --restart unless-stopped linkarr-web
+  --restart unless-stopped bridgarr-web
 ```
 
 ---
@@ -181,11 +181,11 @@ docker run -d -p 3002:3000 --name linkarr-web \
 
 ### Backend Environment (.env)
 
-Location: `/root/linkarr/linkarr-backend/.env`
+Location: `/root/bridgarr/bridgarr-backend/.env`
 
 **Critical Settings:**
 - `APP_VERSION=0.1.0-build.4`
-- `DATABASE_URL=postgresql://linkarr:linkarr_password@postgres:5432/linkarr`
+- `DATABASE_URL=postgresql://bridgarr:bridgarr_password@postgres:5432/bridgarr`
 - `REDIS_URL=redis://redis:6379/0`
 - `SECRET_KEY=<generated>`
 - `CORS_ORIGINS=http://localhost:3000,http://localhost:3002,http://YOUR_SERVER_IP:3002`
@@ -222,7 +222,7 @@ Built with:
    curl http://YOUR_SERVER_IP:8000/api/webhooks/test
    ```
 
-**Full Guide**: See `/root/linkarr/OVERSEERR_INTEGRATION.md`
+**Full Guide**: See `/root/bridgarr/OVERSEERR_INTEGRATION.md`
 
 ---
 
@@ -237,7 +237,7 @@ Built with:
 ### 2. Configure Real-Debrid Token
 
 1. Get API token from: https://real-debrid.com/apitoken
-2. Login to Linkarr web interface
+2. Login to Bridgarr web interface
 3. Go to Settings
 4. Paste RD API token and save
 
@@ -247,12 +247,12 @@ Built with:
 2. SSH to VPS
 3. Edit `.env` file:
    ```bash
-   nano /root/linkarr/linkarr-backend/.env
+   nano /root/bridgarr/bridgarr-backend/.env
    ```
 4. Update `TMDB_API_KEY=your_key_here`
 5. Restart backend:
    ```bash
-   cd /root/linkarr/linkarr-backend
+   cd /root/bridgarr/bridgarr-backend
    docker-compose restart backend
    ```
 
@@ -269,7 +269,7 @@ curl http://YOUR_SERVER_IP:8000/
 Expected response:
 ```json
 {
-  "name": "Linkarr",
+  "name": "Bridgarr",
   "version": "0.1.0-build.4",
   "status": "running",
   "docs": "/api/docs"
@@ -279,7 +279,7 @@ Expected response:
 ### Database Connection
 
 ```bash
-docker-compose exec postgres psql -U linkarr -d linkarr -c "SELECT COUNT(*) FROM users;"
+docker-compose exec postgres psql -U bridgarr -d bridgarr -c "SELECT COUNT(*) FROM users;"
 ```
 
 ### Redis Connection
@@ -298,10 +298,10 @@ Expected: `PONG`
 
 ```bash
 # Check container status
-docker ps | grep linkarr-backend
+docker ps | grep bridgarr-backend
 
 # Check logs for errors
-docker logs linkarr-backend --tail 50
+docker logs bridgarr-backend --tail 50
 
 # Restart if needed
 docker-compose restart backend
@@ -311,13 +311,13 @@ docker-compose restart backend
 
 ```bash
 # Check container status
-docker ps | grep linkarr-web
+docker ps | grep bridgarr-web
 
 # Check logs
-docker logs linkarr-web --tail 50
+docker logs bridgarr-web --tail 50
 
 # Restart
-docker restart linkarr-web
+docker restart bridgarr-web
 ```
 
 ### Database Connection Issues
@@ -327,7 +327,7 @@ docker restart linkarr-web
 docker-compose ps postgres
 
 # Check database logs
-docker logs linkarr-postgres --tail 50
+docker logs bridgarr-postgres --tail 50
 
 # Verify connection from backend
 docker-compose exec backend python -c "from app.database import engine; print(engine.connect())"
@@ -337,7 +337,7 @@ docker-compose exec backend python -c "from app.database import engine; print(en
 
 1. Check CORS_ORIGINS in `.env`:
    ```bash
-   grep CORS_ORIGINS /root/linkarr/linkarr-backend/.env
+   grep CORS_ORIGINS /root/bridgarr/bridgarr-backend/.env
    ```
 
 2. Should include: `http://YOUR_SERVER_IP:3002`
@@ -355,20 +355,20 @@ docker-compose exec backend python -c "from app.database import engine; print(en
 
 ```bash
 # Create backup
-docker-compose exec postgres pg_dump -U linkarr linkarr > backup_$(date +%Y%m%d_%H%M%S).sql
+docker-compose exec postgres pg_dump -U bridgarr bridgarr > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Restore from backup
-docker-compose exec -T postgres psql -U linkarr linkarr < backup_20251015_120000.sql
+docker-compose exec -T postgres psql -U bridgarr bridgarr < backup_20251015_120000.sql
 ```
 
 ### Configuration Backup
 
 ```bash
 # Backup .env file
-cp /root/linkarr/linkarr-backend/.env /root/linkarr/linkarr-backend/.env.backup
+cp /root/bridgarr/bridgarr-backend/.env /root/bridgarr/bridgarr-backend/.env.backup
 
 # Backup docker-compose.yml
-cp /root/linkarr/linkarr-backend/docker-compose.yml /root/linkarr/linkarr-backend/docker-compose.yml.backup
+cp /root/bridgarr/bridgarr-backend/docker-compose.yml /root/bridgarr/bridgarr-backend/docker-compose.yml.backup
 ```
 
 ---
@@ -460,9 +460,9 @@ docker system df
 ## Contact & Support
 
 **Documentation**:
-- README: `/root/linkarr/README.md`
-- Overseerr Integration: `/root/linkarr/OVERSEERR_INTEGRATION.md`
-- Web Frontend: `/root/linkarr/linkarr-web/README.md`
+- README: `/root/bridgarr/README.md`
+- Overseerr Integration: `/root/bridgarr/OVERSEERR_INTEGRATION.md`
+- Web Frontend: `/root/bridgarr/bridgarr-web/README.md`
 
 **API Documentation**: http://YOUR_SERVER_IP:8000/api/docs
 

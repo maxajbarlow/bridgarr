@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Jellyseerr-Linkarr Webhook Configuration Script
+Jellyseerr-Bridgarr Webhook Configuration Script
 
-This script automatically configures the webhook in Jellyseerr-Linkarr
-to send notifications to the Linkarr backend.
+This script automatically configures the webhook in Jellyseerr-Bridgarr
+to send notifications to the Bridgarr backend.
 
 Prerequisites:
-1. Jellyseerr-Linkarr setup wizard must be completed
+1. Jellyseerr-Bridgarr setup wizard must be completed
 2. Admin account must be created
 3. You need your admin email and password
 
@@ -100,9 +100,9 @@ def get_webhook_settings(session_cookie: str) -> Optional[dict]:
 
 def configure_webhook(session_cookie: str) -> bool:
     """
-    Configure webhook for Linkarr
+    Configure webhook for Bridgarr
     """
-    print_colored("[3/5] Configuring webhook for Linkarr...", Colors.YELLOW)
+    print_colored("[3/5] Configuring webhook for Bridgarr...", Colors.YELLOW)
 
     webhook_config = {
         "enabled": True,
@@ -153,11 +153,11 @@ def configure_webhook(session_cookie: str) -> bool:
         return False
 
 
-def test_linkarr_endpoint() -> bool:
+def test_bridgarr_endpoint() -> bool:
     """
-    Test if Linkarr webhook endpoint is reachable
+    Test if Bridgarr webhook endpoint is reachable
     """
-    print_colored("[4/5] Testing Linkarr webhook endpoint...", Colors.YELLOW)
+    print_colored("[4/5] Testing Bridgarr webhook endpoint...", Colors.YELLOW)
 
     try:
         response = requests.get(
@@ -167,7 +167,7 @@ def test_linkarr_endpoint() -> bool:
 
         if response.status_code == 200:
             data = response.json()
-            print_colored("✓ Linkarr endpoint is reachable", Colors.GREEN)
+            print_colored("✓ Bridgarr endpoint is reachable", Colors.GREEN)
             print_colored(f"  Service: {data.get('service')}", Colors.BLUE)
             print_colored(f"  Version: {data.get('version')}", Colors.BLUE)
             return True
@@ -176,7 +176,7 @@ def test_linkarr_endpoint() -> bool:
             return False
 
     except requests.exceptions.RequestException as e:
-        print_colored(f"✗ Cannot reach Linkarr: {str(e)}", Colors.RED)
+        print_colored(f"✗ Cannot reach Bridgarr: {str(e)}", Colors.RED)
         return False
 
 
@@ -208,13 +208,13 @@ def test_webhook(session_cookie: str) -> bool:
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(
-        description="Configure Jellyseerr webhook for Linkarr"
+        description="Configure Jellyseerr webhook for Bridgarr"
     )
     parser.add_argument("--email", help="Jellyseerr admin email")
     parser.add_argument("--password", help="Jellyseerr admin password")
     args = parser.parse_args()
 
-    print_colored("\n=== Jellyseerr-Linkarr Webhook Configuration ===\n", Colors.YELLOW)
+    print_colored("\n=== Jellyseerr-Bridgarr Webhook Configuration ===\n", Colors.YELLOW)
     print(f"Jellyseerr URL: {JELLYSEERR_URL}")
     print(f"Webhook Target: {LINKARR_WEBHOOK_URL}\n")
 
@@ -240,7 +240,7 @@ def main():
         print_colored("\n✗ Configuration failed: Could not configure webhook", Colors.RED)
         sys.exit(1)
 
-    test_linkarr_endpoint()
+    test_bridgarr_endpoint()
     test_webhook(session_cookie)
 
     # Print success message
@@ -253,8 +253,8 @@ def main():
     print("\nNext Steps:")
     print("  1. Request a test movie in Jellyseerr (http://YOUR_SERVER_IP:5057)")
     print("  2. Approve the request")
-    print("  3. Check Linkarr backend logs: docker logs linkarr-backend --tail 50")
-    print("  4. Verify media appears in Linkarr: http://YOUR_SERVER_IP:3002/library")
+    print("  3. Check Bridgarr backend logs: docker logs bridgarr-backend --tail 50")
+    print("  4. Verify media appears in Bridgarr: http://YOUR_SERVER_IP:3002/library")
     print_colored("\nHappy streaming! 🎬\n", Colors.GREEN)
 
 

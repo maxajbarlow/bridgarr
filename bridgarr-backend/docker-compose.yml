@@ -1,24 +1,24 @@
+version: '3.8'
+
 services:
-  # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
     container_name: bridgarr-postgres
     environment:
-      POSTGRES_DB: bridgarr
       POSTGRES_USER: bridgarr
       POSTGRES_PASSWORD: bridgarr_password
+      POSTGRES_DB: bridgarr
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U bridgarr"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
 
-  # Redis Cache & Message Broker
   redis:
     image: redis:7-alpine
     container_name: bridgarr-redis
@@ -26,21 +26,20 @@ services:
       - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
+      interval: 10s
+      timeout: 5s
       retries: 5
     restart: unless-stopped
 
-  # Backend API
   backend:
     build:
-      context: ./bridgarr-backend
+      context: .
       dockerfile: Dockerfile
     container_name: bridgarr-backend
     ports:
       - "8000:8000"
     env_file:
-      - ./bridgarr-backend/.env
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,51 +47,31 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # Celery Worker (Background Tasks)
   celery-worker:
     build:
-      context: ./bridgarr-backend
+      context: .
       dockerfile: Dockerfile
     container_name: bridgarr-celery-worker
-    command: celery -A app.tasks.celery_app worker --loglevel=info
     env_file:
-      - ./bridgarr-backend/.env
+      - .env
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgres
+      - redis
+    command: celery -A app.tasks.celery_app worker --loglevel=info
     restart: unless-stopped
 
-  # Celery Beat (Scheduled Tasks)
   celery-beat:
     build:
-      context: ./bridgarr-backend
+      context: .
       dockerfile: Dockerfile
     container_name: bridgarr-celery-beat
-    command: celery -A app.tasks.celery_app beat --loglevel=info
     env_file:
-      - ./bridgarr-backend/.env
+      - .env
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Web Management Frontend
-  web:
-    build:
-      context: ./bridgarr-web
-      dockerfile: Dockerfile
-    container_name: bridgarr-web
-    ports:
-      - "3002:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://YOUR_SERVER_IP:8000
-    depends_on:
-      - backend
+      - postgres
+      - redis
+    command: celery -A app.tasks.celery_app beat --loglevel=info
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  postgres-data:

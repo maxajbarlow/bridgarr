@@ -1,11 +1,11 @@
-# Jellyseerr Integration Guide for Linkarr
+# Jellyseerr Integration Guide for Bridgarr
 
 ## Overview
 
-This guide covers setting up a **dedicated Jellyseerr instance** specifically for Linkarr. You now have two separate Jellyseerr instances running:
+This guide covers setting up a **dedicated Jellyseerr instance** specifically for Bridgarr. You now have two separate Jellyseerr instances running:
 
 - **Jellyseerr (Port 5055)** - For Jellyfin
-- **Jellyseerr-Linkarr (Port 5057)** - For Linkarr ⭐ NEW!
+- **Jellyseerr-Bridgarr (Port 5057)** - For Bridgarr ⭐ NEW!
 
 Both instances run independently with their own configurations and databases.
 
@@ -13,12 +13,12 @@ Both instances run independently with their own configurations and databases.
 
 ## 🌐 Access Information
 
-**Jellyseerr for Linkarr:**
+**Jellyseerr for Bridgarr:**
 - **URL**: http://YOUR_SERVER_IP:5057
-- **Container**: `jellyseerr-linkarr`
+- **Container**: `jellyseerr-bridgarr`
 - **Image**: fallenbagel/jellyseerr:latest
 - **Status**: ✅ Running
-- **Purpose**: Media requests for Linkarr streaming platform
+- **Purpose**: Media requests for Bridgarr streaming platform
 
 **Jellyseerr for Jellyfin (Existing):**
 - **URL**: http://YOUR_SERVER_IP:5055
@@ -27,9 +27,9 @@ Both instances run independently with their own configurations and databases.
 
 ---
 
-## 🔧 Initial Setup for Linkarr Jellyseerr
+## 🔧 Initial Setup for Bridgarr Jellyseerr
 
-### Step 1: Access Jellyseerr-Linkarr
+### Step 1: Access Jellyseerr-Bridgarr
 
 Open your browser and navigate to:
 ```
@@ -48,8 +48,8 @@ You'll see the setup wizard.
 
 **Important:** Click **"Skip"** when asked about Plex/Jellyfin/Emby.
 
-- Linkarr doesn't need a traditional media server
-- Linkarr handles streaming directly from Real-Debrid
+- Bridgarr doesn't need a traditional media server
+- Bridgarr handles streaming directly from Real-Debrid
 - This Jellyseerr instance is only for request management
 
 ### Step 4: Configure TMDb
@@ -74,9 +74,9 @@ You have two options:
 
 ---
 
-## 🔗 Webhook Configuration for Linkarr
+## 🔗 Webhook Configuration for Bridgarr
 
-After completing initial setup, configure the webhook to send requests to Linkarr.
+After completing initial setup, configure the webhook to send requests to Bridgarr.
 
 ### 🤖 Automated Configuration (Recommended)
 
@@ -86,19 +86,19 @@ We've created a Python script to automate the webhook configuration:
 
 **Step 2**: Run the configuration script:
 ```bash
-cd /root/linkarr/scripts
+cd /root/bridgarr/scripts
 python3 configure-jellyseerr-webhook.py
 ```
 
 The script will:
-- ✅ Login to Jellyseerr-Linkarr
+- ✅ Login to Jellyseerr-Bridgarr
 - ✅ Configure webhook URL
 - ✅ Enable correct notification types
 - ✅ Test the connection
 - ✅ Verify everything works
 
-**Script location**: `/root/linkarr/scripts/configure-jellyseerr-webhook.py`
-**Documentation**: `/root/linkarr/scripts/README.md`
+**Script location**: `/root/bridgarr/scripts/configure-jellyseerr-webhook.py`
+**Documentation**: `/root/bridgarr/scripts/README.md`
 
 ---
 
@@ -108,7 +108,7 @@ If you prefer to configure manually, follow these steps:
 
 ### Step 1: Access Settings
 
-1. Login to Jellyseerr-Linkarr: http://YOUR_SERVER_IP:5057
+1. Login to Jellyseerr-Bridgarr: http://YOUR_SERVER_IP:5057
 2. Click the **Settings** icon (gear) in the top right
 3. Navigate to **Notifications** in the left sidebar
 4. Click on **Webhook**
@@ -127,7 +127,7 @@ http://YOUR_SERVER_IP:8000/api/webhooks/overseerr
 **Important Notes:**
 - Use the IP address (not localhost) for proper connectivity
 - The endpoint is `/api/webhooks/overseerr` (compatible with both Overseerr and Jellyseerr)
-- Port 8000 is the Linkarr backend API
+- Port 8000 is the Bridgarr backend API
 
 ### Step 4: Select Notification Types
 
@@ -168,22 +168,22 @@ curl http://YOUR_SERVER_IP:8000/api/webhooks/test
 {
   "status": "ok",
   "message": "Webhook endpoint is reachable",
-  "service": "Linkarr",
+  "service": "Bridgarr",
   "version": "0.1.0-build.6"
 }
 ```
 
 ### Test 2: Send Test Notification
 
-1. In Jellyseerr-Linkarr webhook settings
+1. In Jellyseerr-Bridgarr webhook settings
 2. Scroll to the bottom
 3. Click **Send Test Notification**
 4. You should see a success message
 
-### Test 3: Check Linkarr Logs
+### Test 3: Check Bridgarr Logs
 
 ```bash
-docker logs linkarr-backend --tail 50
+docker logs bridgarr-backend --tail 50
 ```
 
 Look for:
@@ -193,16 +193,16 @@ INFO: Received webhook notification
 
 ### Test 4: Request a Movie
 
-1. Login to Jellyseerr-Linkarr (port 5057)
+1. Login to Jellyseerr-Bridgarr (port 5057)
 2. Search for a movie (e.g., "The Matrix")
 3. Click **Request**
 4. Approve the request (as admin)
-5. Check Linkarr backend logs
-6. Check Linkarr database:
+5. Check Bridgarr backend logs
+6. Check Bridgarr database:
 
 ```bash
-cd /root/linkarr/linkarr-backend
-docker-compose exec postgres psql -U linkarr -d linkarr \
+cd /root/bridgarr/bridgarr-backend
+docker-compose exec postgres psql -U bridgarr -d bridgarr \
   -c "SELECT id, title, media_type, tmdb_id, is_available FROM media_items ORDER BY created_at DESC LIMIT 5;"
 ```
 
@@ -212,7 +212,7 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 
 ```
 ┌────────────────┐         ┌──────────────┐         ┌──────────────┐
-│   User         │         │ Jellyseerr   │         │   Linkarr    │
+│   User         │         │ Jellyseerr   │         │   Bridgarr    │
 │                │         │  (Port 5057) │         │   Backend    │
 └───────┬────────┘         └──────┬───────┘         └──────┬───────┘
         │                         │                        │
@@ -238,7 +238,7 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
         │                         │                        │
         │                         │<─── 9. Return 200 OK ──│
         │                         │                        │
-        │ 10. Stream from Linkarr │                        │
+        │ 10. Stream from Bridgarr │                        │
         │     Web UI (Port 3002)  │                        │
         └─────────────────────────┼────────────────────────>
                                   │
@@ -252,10 +252,10 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 
 | Service | Port | Purpose | URL |
 |---------|------|---------|-----|
-| **Jellyseerr-Linkarr** | 5057 | Requests for Linkarr | http://YOUR_SERVER_IP:5057 |
+| **Jellyseerr-Bridgarr** | 5057 | Requests for Bridgarr | http://YOUR_SERVER_IP:5057 |
 | **Jellyseerr** | 5055 | Requests for Jellyfin | http://YOUR_SERVER_IP:5055 |
-| **Linkarr Web** | 3002 | Stream media | http://YOUR_SERVER_IP:3002 |
-| **Linkarr API** | 8000 | Backend API | http://YOUR_SERVER_IP:8000 |
+| **Bridgarr Web** | 3002 | Stream media | http://YOUR_SERVER_IP:3002 |
+| **Bridgarr API** | 8000 | Backend API | http://YOUR_SERVER_IP:8000 |
 
 ### Why Two Jellyseerr Instances?
 
@@ -267,7 +267,7 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 - ✅ Each instance has its own database
 
 **Use Cases:**
-- Request via Jellyseerr-Linkarr → Stream via Linkarr (Real-Debrid direct)
+- Request via Jellyseerr-Bridgarr → Stream via Bridgarr (Real-Debrid direct)
 - Request via Jellyseerr → Watch via Jellyfin (traditional media server)
 
 ---
@@ -286,7 +286,7 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
    # nginx example
    server {
        listen 443 ssl;
-       server_name jellyseerr-linkarr.yourdomain.com;
+       server_name jellyseerr-bridgarr.yourdomain.com;
 
        location / {
            proxy_pass http://localhost:5057;
@@ -296,37 +296,37 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 
 2. **Webhook Authentication**
    - Add Authorization header in Jellyseerr webhook settings
-   - Configure Linkarr to validate the token
+   - Configure Bridgarr to validate the token
 
 3. **Firewall Rules**
    ```bash
-   sudo ufw allow 5057/tcp  # Jellyseerr-Linkarr
+   sudo ufw allow 5057/tcp  # Jellyseerr-Bridgarr
    sudo ufw allow 5055/tcp  # Jellyseerr (Jellyfin)
-   sudo ufw allow 3002/tcp  # Linkarr Web
-   sudo ufw allow 8000/tcp  # Linkarr API
+   sudo ufw allow 3002/tcp  # Bridgarr Web
+   sudo ufw allow 8000/tcp  # Bridgarr API
    ```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Problem: Can't Access Jellyseerr-Linkarr
+### Problem: Can't Access Jellyseerr-Bridgarr
 
 **Solutions:**
 
 1. **Check Container Status**
    ```bash
-   docker ps | grep jellyseerr-linkarr
+   docker ps | grep jellyseerr-bridgarr
    ```
 
 2. **Check Logs**
    ```bash
-   docker logs jellyseerr-linkarr --tail 50
+   docker logs jellyseerr-bridgarr --tail 50
    ```
 
 3. **Restart Container**
    ```bash
-   cd /root/jellyseerr-linkarr
+   cd /root/jellyseerr-bridgarr
    docker-compose restart
    ```
 
@@ -334,14 +334,14 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 
 **Solutions:**
 
-1. **Verify Linkarr is Running**
+1. **Verify Bridgarr is Running**
    ```bash
    curl http://YOUR_SERVER_IP:8000/api/webhooks/test
    ```
 
 2. **Check Backend Logs**
    ```bash
-   docker logs linkarr-backend --tail 50
+   docker logs bridgarr-backend --tail 50
    ```
 
 3. **Verify Webhook URL**
@@ -349,13 +349,13 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
    - Correct IP address
    - Port 8000 accessible
 
-### Problem: Requests Don't Appear in Linkarr
+### Problem: Requests Don't Appear in Bridgarr
 
 **Possible Causes:**
 
 1. **TMDb API Key Missing**
    ```bash
-   cd /root/linkarr/linkarr-backend
+   cd /root/bridgarr/bridgarr-backend
    grep TMDB_API_KEY .env
    ```
    Add if missing:
@@ -379,7 +379,7 @@ If port 5057 is already in use:
 
 ```bash
 # Edit docker-compose.yml
-cd /root/jellyseerr-linkarr
+cd /root/jellyseerr-bridgarr
 nano docker-compose.yml
 # Change ports: - 5058:5055  (or another free port)
 docker-compose down
@@ -391,7 +391,7 @@ docker-compose up -d
 ## 📋 Complete Configuration Example
 
 ```yaml
-Jellyseerr-Linkarr Webhook Settings:
+Jellyseerr-Bridgarr Webhook Settings:
   Enable Agent: ✅ ON
   Webhook URL: http://YOUR_SERVER_IP:8000/api/webhooks/overseerr
 
@@ -416,14 +416,14 @@ Jellyseerr-Linkarr Webhook Settings:
 - [ ] Skip media server connection
 - [ ] Configure TMDb
 - [ ] Enable webhook agent
-- [ ] Set webhook URL to Linkarr
+- [ ] Set webhook URL to Bridgarr
 - [ ] Enable correct notification types
 - [ ] Select JSON Payload
 - [ ] Save webhook settings
 - [ ] Send test notification
 - [ ] Request a test movie
-- [ ] Verify in Linkarr backend logs
-- [ ] Check Linkarr web interface for media
+- [ ] Verify in Bridgarr backend logs
+- [ ] Check Bridgarr web interface for media
 
 ---
 
@@ -431,9 +431,9 @@ Jellyseerr-Linkarr Webhook Settings:
 
 | Service | URL | Purpose |
 |---------|-----|---------|
-| Jellyseerr-Linkarr | http://YOUR_SERVER_IP:5057 | Request media for Linkarr |
-| Linkarr Web | http://YOUR_SERVER_IP:3002 | Browse & stream media |
-| Linkarr API | http://YOUR_SERVER_IP:8000 | Backend API |
+| Jellyseerr-Bridgarr | http://YOUR_SERVER_IP:5057 | Request media for Bridgarr |
+| Bridgarr Web | http://YOUR_SERVER_IP:3002 | Browse & stream media |
+| Bridgarr API | http://YOUR_SERVER_IP:8000 | Backend API |
 | API Documentation | http://YOUR_SERVER_IP:8000/api/docs | Swagger UI |
 | Webhook Endpoint | http://YOUR_SERVER_IP:8000/api/webhooks/overseerr | Receives webhooks |
 | Webhook Test | http://YOUR_SERVER_IP:8000/api/webhooks/test | Test connectivity |
@@ -476,7 +476,7 @@ Set request limits per user:
 ## 📚 Additional Resources
 
 - [Jellyseerr Documentation](https://docs.jellyseerr.dev/)
-- [Linkarr API Docs](http://YOUR_SERVER_IP:8000/api/docs)
+- [Bridgarr API Docs](http://YOUR_SERVER_IP:8000/api/docs)
 - [TMDb API](https://developers.themoviedb.org/3)
 - [Real-Debrid API](https://api.real-debrid.com/)
 
@@ -484,24 +484,24 @@ Set request limits per user:
 
 ## 🎬 Next Steps
 
-1. **Complete Jellyseerr-Linkarr Setup**
+1. **Complete Jellyseerr-Bridgarr Setup**
    - Visit: http://YOUR_SERVER_IP:5057
    - Follow setup wizard
    - Configure webhook
 
-2. **Configure Linkarr**
+2. **Configure Bridgarr**
    - Add TMDb API key to backend .env
    - Add Real-Debrid token in web settings
 
 3. **Test Integration**
    - Request a movie
    - Approve it
-   - Watch it appear in Linkarr
-   - Stream from Linkarr web interface!
+   - Watch it appear in Bridgarr
+   - Stream from Bridgarr web interface!
 
 ---
 
 **Last Updated**: 2025-10-16
-**Linkarr Version**: v0.1.0-build.6
-**Jellyseerr-Linkarr Port**: 5057 (dedicated for Linkarr)
-**Container**: `jellyseerr-linkarr`
+**Bridgarr Version**: v0.1.0-build.6
+**Jellyseerr-Bridgarr Port**: 5057 (dedicated for Bridgarr)
+**Container**: `jellyseerr-bridgarr`

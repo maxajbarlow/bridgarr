@@ -1,15 +1,15 @@
-# Linkarr Configuration Scripts
+# Bridgarr Configuration Scripts
 
-This directory contains helper scripts for configuring and managing Linkarr.
+This directory contains helper scripts for configuring and managing Bridgarr.
 
 ## Available Scripts
 
 ### 1. configure-jellyseerr-webhook.py
 
-**Purpose**: Automatically configure Jellyseerr-Linkarr webhook to send media requests to Linkarr backend.
+**Purpose**: Automatically configure Jellyseerr-Bridgarr webhook to send media requests to Bridgarr backend.
 
 **Prerequisites**:
-- Jellyseerr-Linkarr setup wizard must be completed (access http://YOUR_SERVER_IP:5057)
+- Jellyseerr-Bridgarr setup wizard must be completed (access http://YOUR_SERVER_IP:5057)
 - Admin account created in Jellyseerr
 - Python 3 with `requests` library installed
 
@@ -17,7 +17,7 @@ This directory contains helper scripts for configuring and managing Linkarr.
 
 **Interactive mode** (prompts for credentials):
 ```bash
-cd /root/linkarr/scripts
+cd /root/bridgarr/scripts
 python3 configure-jellyseerr-webhook.py
 ```
 
@@ -27,25 +27,25 @@ python3 configure-jellyseerr-webhook.py --email admin@example.com --password You
 ```
 
 **What it does**:
-1. Logs in to Jellyseerr-Linkarr
+1. Logs in to Jellyseerr-Bridgarr
 2. Fetches current webhook settings
-3. Configures webhook to point to Linkarr (`http://YOUR_SERVER_IP:8000/api/webhooks/overseerr`)
+3. Configures webhook to point to Bridgarr (`http://YOUR_SERVER_IP:8000/api/webhooks/overseerr`)
 4. Enables notification types: Media Approved, Media Available, Media Auto-Approved
 5. Tests the webhook connection
-6. Verifies Linkarr endpoint is reachable
+6. Verifies Bridgarr endpoint is reachable
 
 **Example output**:
 ```
-=== Jellyseerr-Linkarr Webhook Configuration ===
+=== Jellyseerr-Bridgarr Webhook Configuration ===
 
 [1/5] Logging in to Jellyseerr...
 ✓ Login successful
 [2/5] Fetching current webhook settings...
 ✓ Retrieved current settings
-[3/5] Configuring webhook for Linkarr...
+[3/5] Configuring webhook for Bridgarr...
 ✓ Webhook configured successfully
-[4/5] Testing Linkarr webhook endpoint...
-✓ Linkarr endpoint is reachable
+[4/5] Testing Bridgarr webhook endpoint...
+✓ Bridgarr endpoint is reachable
 [5/5] Sending test webhook...
 ✓ Test webhook sent successfully
 
@@ -87,17 +87,17 @@ sudo apt-get install curl jq
 
 ### "Connection refused" error
 
-**Problem**: Cannot connect to Jellyseerr or Linkarr
+**Problem**: Cannot connect to Jellyseerr or Bridgarr
 
 **Solutions**:
 1. Verify Jellyseerr is running:
    ```bash
-   docker ps | grep jellyseerr-linkarr
+   docker ps | grep jellyseerr-bridgarr
    ```
 
-2. Verify Linkarr backend is running:
+2. Verify Bridgarr backend is running:
    ```bash
-   docker ps | grep linkarr-backend
+   docker ps | grep bridgarr-backend
    curl http://YOUR_SERVER_IP:8000/api/webhooks/test
    ```
 
@@ -112,12 +112,12 @@ sudo apt-get install curl jq
 
 ### "Webhook test failed" error
 
-**Problem**: Webhook cannot reach Linkarr
+**Problem**: Webhook cannot reach Bridgarr
 
 **Solutions**:
-1. Check Linkarr backend logs:
+1. Check Bridgarr backend logs:
    ```bash
-   docker logs linkarr-backend --tail 50
+   docker logs bridgarr-backend --tail 50
    ```
 
 2. Verify webhook URL is correct:
@@ -162,7 +162,7 @@ Expected response:
 {
   "status": "ok",
   "message": "Webhook endpoint is reachable",
-  "service": "Linkarr",
+  "service": "Bridgarr",
   "version": "0.1.0-build.6"
 }
 ```
@@ -173,9 +173,9 @@ Expected response:
 3. Click Request
 4. Approve the request (or enable auto-approve)
 
-### 3. Check Linkarr logs:
+### 3. Check Bridgarr logs:
 ```bash
-docker logs linkarr-backend --tail 50
+docker logs bridgarr-backend --tail 50
 ```
 
 Look for:
@@ -185,23 +185,23 @@ INFO: Received webhook notification: MEDIA_APPROVED
 
 ### 4. Check database:
 ```bash
-cd /root/linkarr/linkarr-backend
-docker-compose exec postgres psql -U linkarr -d linkarr \
+cd /root/bridgarr/bridgarr-backend
+docker-compose exec postgres psql -U bridgarr -d bridgarr \
   -c "SELECT id, title, media_type, tmdb_id FROM media_items ORDER BY created_at DESC LIMIT 5;"
 ```
 
-### 5. Check Linkarr web interface:
+### 5. Check Bridgarr web interface:
 http://YOUR_SERVER_IP:3002/library
 
 ---
 
 ## Related Documentation
 
-- **Jellyseerr Integration Guide**: `/root/linkarr/JELLYSEERR_LINKARR_INTEGRATION.md`
-- **Deployment Guide**: `/root/linkarr/DEPLOYMENT.md`
-- **Project README**: `/root/linkarr/README.md`
+- **Jellyseerr Integration Guide**: `/root/bridgarr/JELLYSEERR_LINKARR_INTEGRATION.md`
+- **Deployment Guide**: `/root/bridgarr/DEPLOYMENT.md`
+- **Project README**: `/root/bridgarr/README.md`
 
 ---
 
 **Last Updated**: 2025-10-16
-**Linkarr Version**: v0.1.0-build.6
+**Bridgarr Version**: v0.1.0-build.6

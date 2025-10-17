@@ -1,4 +1,4 @@
-# Linkarr End-to-End Test Report
+# Bridgarr End-to-End Test Report
 
 **Date**: 2025-10-16
 **Version**: v0.1.0-build.5
@@ -20,18 +20,18 @@
 
 **Command**:
 ```bash
-docker ps --filter "name=linkarr"
+docker ps --filter "name=bridgarr"
 docker ps --filter "name=jellyseerr"
 ```
 
 **Result**: PASS
-- ✅ linkarr-backend (Up 18 hours, Port 8000)
-- ✅ linkarr-web (Up 18 hours, Port 3002)
-- ✅ linkarr-postgres (Up 25 hours, healthy)
-- ✅ linkarr-redis (Up 25 hours, healthy)
-- ✅ linkarr-celery-worker (Up 25 hours)
-- ✅ linkarr-celery-beat (Up 25 hours)
-- ✅ jellyseerr-linkarr (Up 9 minutes, Port 5057)
+- ✅ bridgarr-backend (Up 18 hours, Port 8000)
+- ✅ bridgarr-web (Up 18 hours, Port 3002)
+- ✅ bridgarr-postgres (Up 25 hours, healthy)
+- ✅ bridgarr-redis (Up 25 hours, healthy)
+- ✅ bridgarr-celery-worker (Up 25 hours)
+- ✅ bridgarr-celery-beat (Up 25 hours)
+- ✅ jellyseerr-bridgarr (Up 9 minutes, Port 5057)
 - ✅ jellyseerr (Up 30 hours, Port 5055)
 
 **Status**: All 8 containers running successfully
@@ -44,7 +44,7 @@ docker ps --filter "name=jellyseerr"
 
 **Command**:
 ```bash
-docker-compose exec postgres psql -U linkarr -d linkarr -c "SELECT version();"
+docker-compose exec postgres psql -U bridgarr -d bridgarr -c "SELECT version();"
 ```
 
 **Result**: PASS
@@ -79,7 +79,7 @@ curl http://YOUR_SERVER_IP:8000/
 **Result**: PASS
 ```json
 {
-  "service": "Linkarr",
+  "service": "Bridgarr",
   "version": "0.1.0-build.5",
   "status": "running"
 }
@@ -115,7 +115,7 @@ curl http://YOUR_SERVER_IP:8000/api/webhooks/test
 {
   "status": "ok",
   "message": "Webhook endpoint is reachable",
-  "service": "Linkarr",
+  "service": "Bridgarr",
   "version": "0.1.0-build.5",
   "timestamp": "2025-10-16T00:01:01.788665"
 }
@@ -127,7 +127,7 @@ curl http://YOUR_SERVER_IP:8000/api/webhooks/test
 
 ### 3.1 Webhook Reception ✅
 
-**Test**: Verify Linkarr can receive Jellyseerr webhooks
+**Test**: Verify Bridgarr can receive Jellyseerr webhooks
 
 **Request**:
 ```bash
@@ -170,7 +170,7 @@ curl -X POST http://YOUR_SERVER_IP:8000/api/webhooks/overseerr \
 
 **Command**:
 ```bash
-docker-compose exec postgres psql -U linkarr -d linkarr \
+docker-compose exec postgres psql -U bridgarr -d bridgarr \
   -c "SELECT id, title, media_type, tmdb_id, is_available FROM media_items ORDER BY created_at DESC LIMIT 1;"
 ```
 
@@ -311,13 +311,13 @@ INFO: "GET /api/auth/rd-token/test HTTP/1.1" 200 OK
 
 ## 6. Jellyseerr Integration Tests
 
-### 6.1 Jellyseerr-Linkarr Instance ✅
+### 6.1 Jellyseerr-Bridgarr Instance ✅
 
 **Test**: Verify dedicated Jellyseerr instance is running
 
 **URL**: http://YOUR_SERVER_IP:5057
 
-**Container**: jellyseerr-linkarr (Up 9 minutes)
+**Container**: jellyseerr-bridgarr (Up 9 minutes)
 
 **Result**: PASS
 - Container running successfully
@@ -331,9 +331,9 @@ INFO: "GET /api/auth/rd-token/test HTTP/1.1" 200 OK
 **Test**: Verify webhook configuration scripts exist and are executable
 
 **Scripts**:
-- `/root/linkarr/scripts/configure-jellyseerr-webhook.py` ✅
-- `/root/linkarr/scripts/configure-jellyseerr-webhook.sh` ✅
-- `/root/linkarr/scripts/README.md` ✅
+- `/root/bridgarr/scripts/configure-jellyseerr-webhook.py` ✅
+- `/root/bridgarr/scripts/configure-jellyseerr-webhook.sh` ✅
+- `/root/bridgarr/scripts/README.md` ✅
 
 **Permissions**: All scripts executable
 
@@ -347,7 +347,7 @@ INFO: "GET /api/auth/rd-token/test HTTP/1.1" 200 OK
 
 **Instances**:
 - **jellyseerr** (Port 5055) - For Jellyfin (Up 30 hours)
-- **jellyseerr-linkarr** (Port 5057) - For Linkarr (Up 9 minutes)
+- **jellyseerr-bridgarr** (Port 5057) - For Bridgarr (Up 9 minutes)
 
 **Result**: PASS
 - No port conflicts
@@ -363,12 +363,12 @@ INFO: "GET /api/auth/rd-token/test HTTP/1.1" 200 OK
 **Test**: Verify all documentation is present and up-to-date
 
 **Files**:
-- ✅ `/root/linkarr/README.md` - Project overview
-- ✅ `/root/linkarr/QUICKSTART.md` - 5-minute setup guide
-- ✅ `/root/linkarr/DEPLOYMENT.md` - Deployment guide
-- ✅ `/root/linkarr/JELLYSEERR_LINKARR_INTEGRATION.md` - Integration guide
-- ✅ `/root/linkarr/scripts/README.md` - Scripts documentation
-- ✅ `/root/linkarr/TEST_REPORT.md` - This test report
+- ✅ `/root/bridgarr/README.md` - Project overview
+- ✅ `/root/bridgarr/QUICKSTART.md` - 5-minute setup guide
+- ✅ `/root/bridgarr/DEPLOYMENT.md` - Deployment guide
+- ✅ `/root/bridgarr/JELLYSEERR_LINKARR_INTEGRATION.md` - Integration guide
+- ✅ `/root/bridgarr/scripts/README.md` - Scripts documentation
+- ✅ `/root/bridgarr/TEST_REPORT.md` - This test report
 
 **Result**: PASS
 
@@ -392,7 +392,7 @@ INFO: "GET /api/auth/rd-token/test HTTP/1.1" 200 OK
    - Jellyseerr sends POST to http://YOUR_SERVER_IP:8000/api/webhooks/overseerr
    - Payload includes TMDb ID, media type, request details
 
-4. **Linkarr receives webhook** ✅
+4. **Bridgarr receives webhook** ✅
    - Backend logs: POST /api/webhooks/overseerr 200 OK
    - Returns immediate 200 response
 
@@ -493,7 +493,7 @@ All core features have been tested and verified working:
 ### Next Steps
 
 1. **User Action Required**:
-   - Complete Jellyseerr-Linkarr setup wizard (http://YOUR_SERVER_IP:5057)
+   - Complete Jellyseerr-Bridgarr setup wizard (http://YOUR_SERVER_IP:5057)
    - Run webhook configuration script
    - Add TMDb API key to backend .env
    - Configure Real-Debrid token in web settings
@@ -506,7 +506,7 @@ All core features have been tested and verified working:
 
 ---
 
-**Test Engineer**: Claude (Linkarr Development Team)
+**Test Engineer**: Claude (Bridgarr Development Team)
 **Date**: 2025-10-16
 **Version Tested**: v0.1.0-build.5
 **Test Environment**: VPS1 (your-vps-hostname, YOUR_SERVER_IP)

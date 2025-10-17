@@ -1,11 +1,11 @@
-# Jellyseerr Integration Guide for Linkarr
+# Jellyseerr Integration Guide for Bridgarr
 
 ## Overview
 
-Jellyseerr (a fork of Overseerr) is already installed and running on your VPS. This guide will help you configure it to work with Linkarr for automatic media requests.
+Jellyseerr (a fork of Overseerr) is already installed and running on your VPS. This guide will help you configure it to work with Bridgarr for automatic media requests.
 
 **What is Jellyseerr?**
-Jellyseerr is a request management and media discovery tool that works with both Plex and Jellyfin. It's a fork of Overseerr with additional features, and it's 100% compatible with Linkarr's webhook system.
+Jellyseerr is a request management and media discovery tool that works with both Plex and Jellyfin. It's a fork of Overseerr with additional features, and it's 100% compatible with Bridgarr's webhook system.
 
 ---
 
@@ -38,7 +38,7 @@ On first access, you'll need to:
 
 2. **Connect to Media Server** (Optional)
    - You can skip this step or configure Plex/Jellyfin if you have them
-   - For Linkarr-only setup, you don't need a media server
+   - For Bridgarr-only setup, you don't need a media server
 
 3. **Configure TMDb**
    - Sign in with your TMDb account
@@ -47,7 +47,7 @@ On first access, you'll need to:
 
 ---
 
-## 🔗 Webhook Configuration for Linkarr
+## 🔗 Webhook Configuration for Bridgarr
 
 ### Step 1: Login to Jellyseerr
 
@@ -71,7 +71,7 @@ http://YOUR_SERVER_IP:8000/api/webhooks/overseerr
 ```
 
 **Important Notes:**
-- Use the IP address, not localhost (unless Jellyseerr and Linkarr are in the same Docker network)
+- Use the IP address, not localhost (unless Jellyseerr and Bridgarr are in the same Docker network)
 - The webhook endpoint is `/api/webhooks/overseerr` (compatible with both Overseerr and Jellyseerr)
 - Make sure the port 8000 is accessible
 
@@ -110,7 +110,7 @@ curl http://YOUR_SERVER_IP:8000/api/webhooks/test
 {
   "status": "ok",
   "message": "Webhook endpoint is reachable",
-  "service": "Linkarr",
+  "service": "Bridgarr",
   "version": "0.1.0-build.6"
 }
 ```
@@ -122,10 +122,10 @@ curl http://YOUR_SERVER_IP:8000/api/webhooks/test
 3. Click **Send Test Notification**
 4. You should see a success message
 
-### Test 3: Check Linkarr Logs
+### Test 3: Check Bridgarr Logs
 
 ```bash
-docker logs linkarr-backend --tail 50
+docker logs bridgarr-backend --tail 50
 ```
 
 Look for:
@@ -162,7 +162,7 @@ Webhook Settings:
 
 ```
 ┌────────────────┐         ┌──────────────┐         ┌──────────────┐
-│   User         │         │   Jellyseerr │         │   Linkarr    │
+│   User         │         │   Jellyseerr │         │   Bridgarr    │
 │                │         │              │         │   Backend    │
 └───────┬────────┘         └──────┬───────┘         └──────┬───────┘
         │                         │                        │
@@ -190,7 +190,7 @@ Webhook Settings:
         │                         │<─── 9. Return 200 OK ──│
         │                         │                        │
         │ 10. Access via          │                        │
-        │     Linkarr Web UI      │                        │
+        │     Bridgarr Web UI      │                        │
         └─────────────────────────┼────────────────────────>
                                   │
 ```
@@ -199,11 +199,11 @@ Webhook Settings:
 
 1. **User requests** content in Jellyseerr (e.g., "Avatar")
 2. **Admin approves** the request (or it's auto-approved)
-3. **Jellyseerr sends webhook** to Linkarr with:
+3. **Jellyseerr sends webhook** to Bridgarr with:
    - Media type (movie/tv)
    - TMDb ID
    - Request details
-4. **Linkarr receives webhook** and creates background task
+4. **Bridgarr receives webhook** and creates background task
 5. **Immediate response** sent to Jellyseerr (200 OK)
 6. **Background processing**:
    - Fetches TMDb metadata
@@ -211,7 +211,7 @@ Webhook Settings:
    - Searches for torrents (when implemented)
    - Adds to Real-Debrid
    - Generates streaming URLs
-7. **Media appears** in Linkarr web interface
+7. **Media appears** in Bridgarr web interface
 8. **User can stream** directly from RD CDN
 
 ---
@@ -231,22 +231,22 @@ Webhook Settings:
 2. Go to **Requests** page
 3. Approve the pending request
 
-### Step 3: Verify in Linkarr
+### Step 3: Verify in Bridgarr
 
-1. Check Linkarr backend logs:
+1. Check Bridgarr backend logs:
 ```bash
-docker logs linkarr-backend --tail 50
+docker logs bridgarr-backend --tail 50
 ```
 
-2. Check Linkarr web interface:
+2. Check Bridgarr web interface:
 ```
 http://YOUR_SERVER_IP:3002/library
 ```
 
 3. Verify database entry:
 ```bash
-cd /root/linkarr/linkarr-backend
-docker-compose exec postgres psql -U linkarr -d linkarr \
+cd /root/bridgarr/bridgarr-backend
+docker-compose exec postgres psql -U bridgarr -d bridgarr \
   -c "SELECT id, title, media_type, tmdb_id, is_available FROM media_items ORDER BY created_at DESC LIMIT 5;"
 ```
 
@@ -263,7 +263,7 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 
 1. **Add Reverse Proxy**
    - Use nginx or Caddy with SSL
-   - Enable HTTPS for both Jellyseerr and Linkarr
+   - Enable HTTPS for both Jellyseerr and Bridgarr
    - Update webhook URL to use HTTPS
 
 2. **Webhook Authentication**
@@ -271,18 +271,18 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
    Authorization Header: Bearer your-secret-token
    ```
    - Add to Jellyseerr webhook settings
-   - Configure Linkarr to validate token
+   - Configure Bridgarr to validate token
 
 3. **Network Isolation**
-   - Put Jellyseerr and Linkarr in same Docker network
+   - Put Jellyseerr and Bridgarr in same Docker network
    - Use internal hostnames instead of public IPs
    - Only expose necessary ports
 
 4. **Firewall Rules**
    ```bash
    sudo ufw allow 5055/tcp  # Jellyseerr
-   sudo ufw allow 8000/tcp  # Linkarr API
-   sudo ufw allow 3002/tcp  # Linkarr Web
+   sudo ufw allow 8000/tcp  # Bridgarr API
+   sudo ufw allow 3002/tcp  # Bridgarr Web
    ```
 
 ---
@@ -293,7 +293,7 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 
 **Solutions:**
 
-1. **Check Linkarr is Running**
+1. **Check Bridgarr is Running**
    ```bash
    curl http://YOUR_SERVER_IP:8000/api/webhooks/test
    ```
@@ -301,7 +301,7 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 2. **Check Docker Logs**
    ```bash
    docker logs jellyseerr --tail 50
-   docker logs linkarr-backend --tail 50
+   docker logs bridgarr-backend --tail 50
    ```
 
 3. **Verify URL**
@@ -313,14 +313,14 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
 
 **Solutions:**
 
-1. **Check Linkarr Logs**
+1. **Check Bridgarr Logs**
    ```bash
-   docker logs linkarr-backend -f
+   docker logs bridgarr-backend -f
    ```
 
 2. **Verify TMDb API Key**
    ```bash
-   cd /root/linkarr/linkarr-backend
+   cd /root/bridgarr/bridgarr-backend
    grep TMDB_API_KEY .env
    ```
 
@@ -329,11 +329,11 @@ docker-compose exec postgres psql -U linkarr -d linkarr \
    docker-compose ps postgres
    ```
 
-### Problem: Media Doesn't Appear in Linkarr
+### Problem: Media Doesn't Appear in Bridgarr
 
 **Possible Causes:**
 
-1. **No Real-Debrid Token** - Configure in Linkarr settings
+1. **No Real-Debrid Token** - Configure in Bridgarr settings
 2. **TMDb API Key Missing** - Add to backend .env
 3. **Webhook Not Configured** - Check Jellyseerr settings
 4. **Wrong Notification Type** - Must be "Media Approved/Available"
@@ -370,8 +370,8 @@ When Jellyseerr sends a webhook for "Media Approved":
 | Service | URL | Purpose |
 |---------|-----|---------|
 | Jellyseerr Web | http://YOUR_SERVER_IP:5055 | Request media |
-| Linkarr Web | http://YOUR_SERVER_IP:3002 | Browse library |
-| Linkarr API | http://YOUR_SERVER_IP:8000 | Backend API |
+| Bridgarr Web | http://YOUR_SERVER_IP:3002 | Browse library |
+| Bridgarr API | http://YOUR_SERVER_IP:8000 | Backend API |
 | Webhook Endpoint | http://YOUR_SERVER_IP:8000/api/webhooks/overseerr | Receives webhooks |
 | Webhook Test | http://YOUR_SERVER_IP:8000/api/webhooks/test | Test connectivity |
 
@@ -383,8 +383,8 @@ When Jellyseerr sends a webhook for "Media Approved":
 2. **Complete initial setup** (admin account, TMDb)
 3. **Configure webhook** following this guide
 4. **Test with a movie request**
-5. **Verify in Linkarr web interface**
-6. **Configure Real-Debrid token** in Linkarr settings
+5. **Verify in Bridgarr web interface**
+6. **Configure Real-Debrid token** in Bridgarr settings
 
 ---
 
@@ -392,12 +392,12 @@ When Jellyseerr sends a webhook for "Media Approved":
 
 - [Jellyseerr Documentation](https://docs.jellyseerr.dev/)
 - [Overseerr Documentation](https://docs.overseerr.dev/) (compatible)
-- [Linkarr API Docs](http://YOUR_SERVER_IP:8000/api/docs)
+- [Bridgarr API Docs](http://YOUR_SERVER_IP:8000/api/docs)
 - [TMDb API](https://developers.themoviedb.org/3)
 - [Real-Debrid API](https://api.real-debrid.com/)
 
 ---
 
 **Last Updated**: 2025-10-16
-**Linkarr Version**: v0.1.0-build.6
+**Bridgarr Version**: v0.1.0-build.6
 **Jellyseerr Version**: Latest (fallenbagel/jellyseerr)
