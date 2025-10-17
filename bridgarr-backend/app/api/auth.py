@@ -13,7 +13,8 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.models.user import User
+from app.models.user import User, DebridProvider
+from app.services.debrid import get_debrid_client
 
 # Router setup
 router = APIRouter()
@@ -41,7 +42,9 @@ class UserResponse(BaseModel):
     email: str
     is_active: bool
     is_admin: bool
-    has_rd_token: bool
+    has_rd_token: bool  # Legacy field for backwards compatibility
+    has_debrid_token: bool = False
+    debrid_provider: str = "real-debrid"
     created_at: datetime
 
     class Config:
@@ -54,7 +57,12 @@ class Token(BaseModel):
 
 
 class RDTokenRequest(BaseModel):
-    rd_api_token: str
+    rd_api_token: str  # Legacy field
+
+
+class DebridTokenRequest(BaseModel):
+    provider: DebridProvider
+    api_token: str
 
 
 # Helper functions
@@ -140,8 +148,9 @@ async def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # Add has_rd_token property
-    new_user.has_rd_token = new_user.rd_api_token is not None
+    # Add computed properties
+    new_user.has_rd_token = new_user.rd_api_token is not None or new_user.debrid_api_token is not None
+    new_user.has_debrid_token = new_user.debrid_api_token is not None
 
     return new_user
 
@@ -184,8 +193,9 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     - Requires valid JWT token
     - Returns user details
     """
-    # Add has_rd_token property
-    current_user.has_rd_token = current_user.rd_api_token is not None
+    # Add computed properties
+    current_user.has_rd_token = current_user.rd_api_token is not None or current_user.debrid_api_token is not None
+    current_user.has_debrid_token = current_user.debrid_api_token is not None
     return current_user
 
 
@@ -209,10 +219,132 @@ async def store_rd_token(
     db.commit()
     db.refresh(current_user)
 
-    # Add has_rd_token property
-    current_user.has_rd_token = current_user.rd_api_token is not None
+    # Add computed properties
+    current_user.has_rd_token = current_user.rd_api_token is not None or current_user.debrid_api_token is not None
+    current_user.has_debrid_token = current_user.debrid_api_token is not None
 
     return current_user
+
+
+@router.post("/debrid-token", response_model=UserResponse)
+async def store_debrid_token(
+    token_data: DebridTokenRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Store debrid service API token for user
+
+    - Updates user's debrid provider and token
+    - Validates token with provider API
+    - Sets expiration to 90 days from now
+    - Returns updated user info
+    """
+    # Validate token with provider
+    try:
+        debrid_client = get_debrid_client(token_data.provider, token_data.api_token)
+        if not debrid_client.validate_token():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid {token_data.provider} API token"
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to validate token: {str(e)}"
+        )
+
+    # Update user's debrid configuration
+    current_user.debrid_provider = token_data.provider
+    current_user.debrid_api_token = token_data.api_token
+    current_user.debrid_token_expires_at = datetime.utcnow() + timedelta(days=90)
+
+    # Also update legacy rd_api_token if provider is Real-Debrid
+    if token_data.provider == DebridProvider.REAL_DEBRID:
+        current_user.rd_api_token = token_data.api_token
+        current_user.rd_token_expires_at = current_user.debrid_token_expires_at
+
+    db.commit()
+    db.refresh(current_user)
+
+    # Add computed properties
+    current_user.has_rd_token = current_user.rd_api_token is not None or current_user.debrid_api_token is not None
+    current_user.has_debrid_token = current_user.debrid_api_token is not None
+
+    return current_user
+
+
+@router.get("/debrid-token/test")
+async def test_debrid_token(current_user: User = Depends(get_current_user)):
+    """
+    Test if debrid service token is valid
+
+    - Checks if user has debrid token configured
+    - Validates token with provider API
+    - Returns validation status and provider info
+    """
+    if not current_user.debrid_api_token:
+        # Check legacy RD token
+        if current_user.rd_api_token:
+            return {
+                "valid": True,
+                "provider": "real-debrid",
+                "message": "Using legacy Real-Debrid token",
+                "username": current_user.username
+            }
+        return {
+            "valid": False,
+            "message": "No debrid service token configured"
+        }
+
+    # Validate with provider API
+    try:
+        debrid_client = get_debrid_client(current_user.debrid_provider, current_user.debrid_api_token)
+        is_valid = debrid_client.validate_token()
+
+        if is_valid:
+            user_info = debrid_client.get_user_info()
+            return {
+                "valid": True,
+                "provider": current_user.debrid_provider.value,
+                "message": f"{current_user.debrid_provider.value} token is valid",
+                "username": current_user.username,
+                "provider_username": user_info.get("username") or user_info.get("email")
+            }
+        else:
+            return {
+                "valid": False,
+                "provider": current_user.debrid_provider.value,
+                "message": f"{current_user.debrid_provider.value} token is invalid or expired"
+            }
+    except Exception as e:
+        return {
+            "valid": False,
+            "provider": current_user.debrid_provider.value if current_user.debrid_provider else "unknown",
+            "message": f"Failed to validate token: {str(e)}"
+        }
+
+
+@router.delete("/debrid-token", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_debrid_token(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Remove debrid service API token from user account
+
+    - Clears debrid token and expiration
+    - Also clears legacy RD token
+    - Returns 204 No Content
+    """
+    current_user.debrid_api_token = None
+    current_user.debrid_token_expires_at = None
+    current_user.rd_api_token = None
+    current_user.rd_token_expires_at = None
+
+    db.commit()
+
+    return None
 
 
 @router.get("/rd-token/test")

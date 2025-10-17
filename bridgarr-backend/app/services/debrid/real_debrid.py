@@ -7,16 +7,17 @@ import requests
 from typing import Optional, Dict, List, Any
 from datetime import datetime, timedelta
 import logging
+from .base import BaseDebridClient, DebridServiceError, TorrentStatus
 
 logger = logging.getLogger(__name__)
 
 
-class RealDebridAPIError(Exception):
+class RealDebridAPIError(DebridServiceError):
     """Custom exception for Real-Debrid API errors"""
     pass
 
 
-class RealDebridClient:
+class RealDebridClient(BaseDebridClient):
     """
     Real-Debrid API client for torrent and link management
 
@@ -32,7 +33,7 @@ class RealDebridClient:
         Args:
             api_token: User's Real-Debrid API token
         """
-        self.api_token = api_token
+        super().__init__(api_token)
         self.session = requests.Session()
         self.session.headers.update({
             "Authorization": f"Bearer {api_token}",
@@ -153,6 +154,34 @@ class RealDebridClient:
         file_ids_str = ",".join(map(str, file_ids)) if file_ids else "all"
         data = {"files": file_ids_str}
         self._make_request("POST", f"torrents/selectFiles/{torrent_id}", data=data, use_form_data=True)
+
+    def normalize_torrent_status(self, provider_status: str) -> TorrentStatus:
+        """
+        Convert Real-Debrid status to standardized status
+
+        Args:
+            provider_status: Status string from RD API
+
+        Returns:
+            Standardized TorrentStatus enum value
+        """
+        status_map = {
+            "magnet_conversion": TorrentStatus.QUEUED,
+            "waiting_files_selection": TorrentStatus.QUEUED,
+            "queued": TorrentStatus.QUEUED,
+            "downloading": TorrentStatus.DOWNLOADING,
+            "compressing": TorrentStatus.PROCESSING,
+            "uploading": TorrentStatus.PROCESSING,
+            "downloaded": TorrentStatus.READY,
+            "error": TorrentStatus.ERROR,
+            "virus": TorrentStatus.ERROR,
+            "dead": TorrentStatus.DEAD,
+        }
+        return status_map.get(provider_status.lower(), TorrentStatus.ERROR)
+
+    def get_instant_availability(self, info_hash: str) -> Dict[str, Any]:
+        """Alias for get_torrent_instant_availability for interface compliance"""
+        return self.get_torrent_instant_availability(info_hash)
 
     def get_torrent_instant_availability(self, info_hash: str) -> Dict[str, Any]:
         """

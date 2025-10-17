@@ -14,11 +14,11 @@ Traditional media server setups (Plex/Jellyfin + Sonarr/Radarr) require you to:
 
 **Bridgarr takes a different approach:**
 - Store only metadata and streaming URLs (a few MB vs. TB)
-- Stream directly from Real-Debrid's global CDN
+- Stream directly from debrid service CDNs (Real-Debrid, AllDebrid, Premiumize, Debrid-Link)
 - Zero bandwidth usage on your server
 - Instant playback as soon as content is cached
 
-It's perfect if you already have a Real-Debrid account and want a clean, simple interface to request and stream content without managing a traditional media server.
+It's perfect if you already have a debrid service account and want a clean, simple interface to request and stream content without managing a traditional media server.
 
 ## How It Works
 
@@ -40,7 +40,11 @@ Stream directly from Real-Debrid CDN (no server bandwidth used!)
 
 - A VPS or home server (1GB RAM is plenty)
 - Docker & Docker Compose installed
-- A [Real-Debrid](https://real-debrid.com) premium account
+- A premium account with one of the supported debrid services:
+  - [Real-Debrid](https://real-debrid.com) (€3/month)
+  - [AllDebrid](https://alldebrid.com) (€3/month)
+  - [Premiumize](https://premiumize.me) (~€8/month)
+  - [Debrid-Link](https://debrid-link.fr) (€3/month)
 - A [TMDb API key](https://www.themoviedb.org/settings/api) (free)
 - 15 minutes
 
@@ -102,14 +106,15 @@ That's it. No downloads, no waiting for files to finish, no storage management.
 
 ## Features
 
-### What's Working (v1.0.0)
+### What's Working (v1.0.1)
 
+- ✅ **Multiple Debrid Providers** - Support for Real-Debrid, AllDebrid, Premiumize, and Debrid-Link
 - ✅ **Jellyseerr Webhook Integration** - Automatic content addition on approval
-- ✅ **Real-Debrid Integration** - Smart file selection, torrent caching, direct streaming
+- ✅ **Smart File Selection** - Intelligent torrent file selection, avoiding archives
 - ✅ **TMDb Metadata** - Automatic poster, plot, and metadata fetching
 - ✅ **Netflix-Style Web UI** - Browse your library with movie posters
 - ✅ **Advanced Video Player** - Plyr integration with quality selection and speed control
-- ✅ **Multi-User Support** - Each user brings their own Real-Debrid account
+- ✅ **Multi-User Support** - Each user brings their own debrid service account
 - ✅ **Background Tasks** - Auto-refresh streaming URLs before they expire
 - ✅ **JWT Authentication** - Secure API access
 - ✅ **Responsive Design** - Works on desktop, tablet, and mobile
@@ -178,15 +183,20 @@ RD_API_BASE_URL=https://api.real-debrid.com/rest/1.0
 RD_LINK_EXPIRY_HOURS=4
 ```
 
-### User Real-Debrid Tokens
+### User Debrid Service Tokens
 
-Each user adds their own Real-Debrid API token in the web UI:
+Each user adds their own debrid service API token in the web UI:
 1. Log in to Bridgarr
 2. Click your username → Settings
-3. Paste your RD token from https://real-debrid.com/apitoken
-4. Save
+3. Select your debrid provider (Real-Debrid, AllDebrid, Premiumize, or Debrid-Link)
+4. Paste your API token:
+   - **Real-Debrid**: https://real-debrid.com/apitoken
+   - **AllDebrid**: https://alldebrid.com/apikeys
+   - **Premiumize**: https://www.premiumize.me/account
+   - **Debrid-Link**: https://debrid-link.fr/webapp/apikey
+5. Save
 
-Now when you request content, Bridgarr uses your RD account to cache and stream.
+Now when you request content, Bridgarr uses your chosen debrid service to cache and stream.
 
 ## Usage
 
@@ -265,8 +275,8 @@ POST /api/webhooks/overseerr   # Jellyseerr webhook endpoint
 
 ## FAQ
 
-**Q: Do I need a Real-Debrid account?**
-A: Yes, every user needs their own Real-Debrid premium account. It costs about €3/month.
+**Q: Do I need a debrid service account?**
+A: Yes, every user needs their own premium account with one of the supported services (Real-Debrid, AllDebrid, Premiumize, or Debrid-Link). Most cost around €3/month.
 
 **Q: Does Bridgarr download files to my server?**
 A: No! That's the point. Bridgarr only stores metadata (movie title, poster, RD URL). You stream directly from Real-Debrid's CDN.
@@ -317,7 +327,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ---
 
-**Current Version:** v1.0.0
+**Current Version:** v1.0.1
 **Status:** Production Ready
 **Last Updated:** 2025-10-17
 
